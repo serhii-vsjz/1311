@@ -45,12 +45,5 @@ services:
       volumes:
         - .:/app
       command: install
-    nodejs:
-      build:
-        context: .docker
-        dockerfile: node/node.docker
-      container_name: ${COMPOSE_PROJECT_NAME}_node
-      volumes:
-        - ./:/var/www
 volumes:
     database:
