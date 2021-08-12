@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AddressController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,5 +15,9 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('create');
 });
+Route::get('/address/create', [AddressController::class, 'create'])->name('create');
+Route::post('/address/', [AddressController::class, 'store'])->name('address.store');
+Route::get('/areas/{id}', [AddressController::class, 'areas']);
+Route::get('/areas/destroy/{id}', [AddressController::class, 'destroy'])->name('address.destroy');
