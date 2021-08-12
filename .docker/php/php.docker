@@ -1,0 +1,35 @@
+FROM php:7.4-fpm-alpine
+
+RUN apk add \
+    php7-dev \
+    gcc \
+    g++ \
+    make \
+    freetype-dev \
+    libjpeg-turbo-dev \
+    libpng-dev \
+    icu-dev \
+    postgresql-dev
+
+RUN docker-php-ext-configure gd \
+    --with-freetype \
+    --with-jpeg
+
+RUN docker-php-ext-install -j$(nproc) \
+    pdo_mysql
+
+RUN addgroup -g 1000 -S www &&\
+    adduser -u 1000 -S www -G www
+
+RUN sed -i "s|user\s*=\s*www-data|user = www|i" /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i "s|group\s*=\s*www-data|group = www|i" /usr/local/etc/php-fpm.d/www.conf
+
+RUN /sbin/ip route|awk '/default/ { print "xdebug.remote_host="$3 }' >> /usr/local/etc/php/php.ini
+
+RUN pecl install xdebug && docker-php-ext-enable xdebug \
+    && echo "xdebug.remote_enable=1" >> /usr/local/etc/php/php.ini \
+    && /sbin/ip route|awk '/default/ { print "xdebug.remote_host="$3 }' >> /usr/local/etc/php/php.ini
+
+WORKDIR /var/www
+
+CMD ["php-fpm"]

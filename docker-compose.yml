@@ -1,0 +1,56 @@
+version: '3'
+# All Docker variables configured in .env file
+
+services:
+    app:
+        build:
+            context: .docker
+            dockerfile: php/php.docker
+        container_name: ${COMPOSE_PROJECT_NAME}_php
+        working_dir: ${DOCKER_SERVER_PATH}
+        volumes:
+            - ./:${DOCKER_SERVER_PATH}
+            - ./.docker/php/php.ini:/usr/local/etc/php/conf.d/php.ini # `/etc/php/conf.d/php.ini` will overwrite the settings in `php.ini`.
+            - ./.docker/php/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
+        links:
+            - db
+    db:
+          image: mysql:8.0.26
+          container_name: ${COMPOSE_PROJECT_NAME}_db
+          environment:
+              MYSQL_DATABASE: app
+              MYSQL_ROOT_PASSWORD: app
+              MYSQL_USER: app
+              MYSQL_PASSWORD: app
+          volumes:
+              - database:/var/lib/mysql
+          ports:
+              - "3306:3306"
+          command: [ "mysqld", "--character-set-server=utf8", "--collation-server=utf8_general_ci" ]
+    nginx:
+        build:
+            context: .docker
+            dockerfile: nginx/nginx.docker
+        container_name: ${COMPOSE_PROJECT_NAME}_nginx
+        ports:
+            - "80:80"
+        volumes:
+            - ./:${DOCKER_SERVER_PATH}
+            - ./.docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+        links:
+            - app
+    composer:
+      image: composer:2.0.6
+      container_name: ${COMPOSE_PROJECT_NAME}_composer
+      volumes:
+        - .:/app
+      command: install
+    nodejs:
+      build:
+        context: .docker
+        dockerfile: node/node.docker
+      container_name: ${COMPOSE_PROJECT_NAME}_node
+      volumes:
+        - ./:/var/www
+volumes:
+    database:
