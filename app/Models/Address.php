@@ -36,6 +36,16 @@ class Address extends Model
 
     public function __toString()
     {
-        return "г. {$this->city->name}, {$this->area->name} раен, {$this->street} {$this->house} ({$this->additional})";
+        $string = "г.{$this->city->name}, {$this->area->name} раен";
+        if ($this->street) {
+            $string .= ", {$this->street}";
+        }
+        if ($this->house) {
+            $string .= " {$this->house}";
+        }
+        if ($this->additional) {
+            $string .= " ({$this->additional})";
+        }
+        return $string;
     }
 }
