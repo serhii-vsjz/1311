@@ -45,7 +45,7 @@
                             @csrf
                             <div class="field">
                                 <label>Name *</label>
-                                <input name="name" type="text" value="" palceholder="" class="vl_empty" />
+                                <input required name="name" type="text" value="" palceholder="" class="vl_empty" />
                             </div>
                             <div class="field">
                                 <label>Your city *</label>
